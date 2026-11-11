@@ -1,0 +1,8 @@
+office-wasm-sdk
+Copyright 2026 the office-wasm-sdk authors
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+This repository contains no code of the office-wasm viewer (AGPL-3.0-or-later). It talks to the viewer only through
+window.postMessage; the viewer, x2t.wasm and metafile.wasm are separate programs with their own licences
+(see the office-wasm-viewer and metafile-wasm repositories).

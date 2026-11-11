@@ -2,7 +2,7 @@
   "name": "office-wasm-sdk",
   "version": "0.1.0",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "description": "Host side of office-wasm: SDK for the viewer iframe, pure-JS text extraction, demo page and end-to-end tests",
   "scripts": {
     "serve": "node demo/server.cjs",
