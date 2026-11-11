@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Office offline preview PoC</title>
+<style>
+  :root { color-scheme: light; --line: #d7dbe0; --bg: #f5f6f8; --ink: #1c2530; --accent: #1a5fb4; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; font: 14px/1.4 system-ui, "Segoe UI", sans-serif; color: var(--ink); background: var(--bg); }
+  body { display: grid; grid-template-columns: 320px 1fr; }
+  aside { border-right: 1px solid var(--line); padding: 12px; overflow: auto; display: flex; flex-direction: column; gap: 10px; background: #fff; }
+  h1 { font-size: 15px; margin: 0; }
+  fieldset { border: 1px solid var(--line); border-radius: 6px; padding: 8px; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  legend { font-size: 12px; color: #5b6673; padding: 0 4px; }
+  button, select { font: inherit; padding: 5px 9px; border: 1px solid var(--line); border-radius: 5px; background: #fff; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button:disabled { opacity: .5; cursor: default; }
+  #log { font: 12px/1.45 ui-monospace, Consolas, monospace; white-space: pre-wrap; word-break: break-word; background: #10161d; color: #cfe3f5; border-radius: 6px; padding: 8px; flex: 1; min-height: 160px; overflow: auto; }
+  main { position: relative; min-width: 0; }
+  #stage, #textview { position: absolute; inset: 0; }
+  #textview { z-index: 1; }
+  #textview { display: none; overflow: auto; background: #fff; padding: 16px; font: 13px/1.5 ui-monospace, Consolas, monospace; white-space: pre-wrap; }
+  #drop { position: absolute; inset: 0; display: grid; place-items: center; color: #6b7785; pointer-events: none; }
+</style>
+</head>
+<body>
+<aside>
+  <h1>Office offline preview (x2t.wasm + sdkjs)</h1>
+  <fieldset>
+    <legend>Mở file</legend>
+    <input type="file" id="file" accept=".docx,.xlsx,.pptx,.doc,.xls,.ppt,.odt,.ods,.odp,.rtf">
+    <button data-sample="medium.docx">medium.docx</button>
+    <button data-sample="fonts_and_images.docx">images.docx</button>
+    <button data-sample="test1.xlsx">test1.xlsx</button>
+    <button data-sample="simple.pptx">simple.pptx</button>
+    <button data-sample="emf-math.docx" title="công thức EMF (MT Extra, Symbol, Euclid)">emf-math</button>
+    <button data-sample="gdiplus-EmfPlusOnly.docx" title="EMF+ (GDI+)">emf+</button>
+    <button data-sample="gdiplus-emz.docx" title="EMZ (EMF nén gzip)">emz</button>
+    <button data-sample="vn-fonts.docx" title="Times New Roman/Arial/Calibri thay thế, .VnTime/.VnTimeH">vn-fonts</button>
+  </fieldset>
+  <fieldset>
+    <legend>Giao diện</legend>
+    <select id="mode">
+      <option value="embedded">embedded (viewer nhẹ)</option>
+      <option value="desktop">desktop (editor đầy đủ, chế độ xem)</option>
+      <option value="edit">edit (editor đầy đủ, chỉnh sửa được)</option>
+    </select>
+    <label style="display:block;margin-top:8px;font-size:13px" title="Chromium: trình duyệt hỏi quyền đọc font cài trong máy; chỉ các font mà tài liệu dùng được đọc">
+      <input type="checkbox" id="localfonts"> Dùng font cài trong máy (Chromium)
+    </label>
+  </fieldset>
+  <fieldset>
+    <legend>Chuyển đổi</legend>
+    <button id="save" disabled title="Chỉ ở chế độ edit: ghi lại tài liệu đã sửa thành .docx/.xlsx/.pptx">Lưu file đã sửa</button>
+    <button id="pdf" disabled>Xuất PDF</button>
+    <button id="text" disabled>Trích văn bản (JS)</button>
+    <button id="x2ttext" disabled>Trích văn bản (x2t)</button>
+    <button id="showdoc" disabled>Xem tài liệu</button>
+  </fieldset>
+  <div id="log"></div>
+</aside>
+<main>
+  <div id="drop">Chọn hoặc kéo thả file .docx / .xlsx / .pptx</div>
+  <div id="stage"><div id="placeholder"></div></div>
+  <div id="textview"></div>
+</main>
+<script type="module" src="/app.mjs"></script>
+</body>
+</html>
