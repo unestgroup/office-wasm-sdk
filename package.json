@@ -1,0 +1,16 @@
+{
+  "name": "office-wasm-sdk",
+  "version": "0.1.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "description": "Host side of office-wasm: SDK for the viewer iframe, pure-JS text extraction, demo page and end-to-end tests",
+  "scripts": {
+    "serve": "node demo/server.cjs",
+    "e2e": "node demo/e2e.cjs",
+    "e2e:coi": "node demo/e2e.cjs --coi --report report.coi.json",
+    "bench:extract": "node tools/extract-bench.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.65.0"
+  }
+}
