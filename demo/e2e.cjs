@@ -3,6 +3,7 @@
 //   --local-fonts   Windows only: the page gets a queryLocalFonts() that serves some fonts of C:\Windows\Fonts (the real API needs a
 //                   permission prompt), the demo opens with "fonts of this computer" and the run checks they reach editor and PDF
 //                            [--coi] [--x2t prebuilt|st|mt] [--threads N] [--report report.json]
+//   --viewer-url <url>  test an already running viewer site (e.g. a packed one: node ../office-wasm-viewer/tools/serve.cjs 8766 --site <dist>/site) instead of starting the viewer
 //   --coi  serve with COOP + COEP (cross-origin isolated page -> the multi-threaded x2t build is used when present)
 //   --x2t  force one x2t build instead of the automatic choice
 //   --threads N  thread pool size of the multi-threaded build
@@ -24,7 +25,8 @@ const arg = (name, dflt) => {
 };
 const port = Number(arg('port', 8765));
 const base = 'http://127.0.0.1:' + port;
-const viewerBase = 'http://127.0.0.1:' + (port + 1); // the viewer runs on its own origin (server.cjs starts it)
+const viewerUrl = arg('viewer-url', ''); // an already running viewer site (for example a packed one); default: server.cjs starts the viewer
+const viewerBase = (viewerUrl || 'http://127.0.0.1:' + (port + 1)).replace(/\/$/, ''); // the viewer runs on its own origin
 const modes = arg('modes', 'embedded,desktop').split(',');
 const samples = arg('samples', 'medium.docx,fonts_and_images.docx,test1.xlsx,simple.pptx').split(',');
 const headed = process.argv.includes('--headed');
@@ -255,7 +257,7 @@ async function runOne(browser, sample, mode) {
 (async () => {
   fs.mkdirSync(outDir, { recursive: true });
   const { chromium } = require('playwright');
-  const server = spawn(process.execPath, [path.join(__dirname, 'server.cjs'), String(port), ...(coi ? ['--coi'] : [])], { stdio: ['ignore', 'inherit', 'inherit'] });
+  const server = spawn(process.execPath, [path.join(__dirname, 'server.cjs'), String(port), ...(coi ? ['--coi'] : []), ...(viewerUrl ? ['--viewer-url', viewerUrl] : [])], { stdio: ['ignore', 'inherit', 'inherit'] });
   const report = { startedAt: new Date().toISOString(), node: process.version, coi, forceX2t: forceX2t || null, mathFonts: mathFonts || null, runs: [] };
   let browser;
   try {
