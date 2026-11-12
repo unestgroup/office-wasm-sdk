@@ -8,9 +8,28 @@
     "serve": "node demo/server.cjs",
     "e2e": "node demo/e2e.cjs",
     "e2e:coi": "node demo/e2e.cjs --coi --report report.coi.json",
-    "bench:extract": "node tools/extract-bench.mjs"
+    "bench:extract": "node tools/extract-bench.mjs",
+    "pack": "node -e \"require('fs').mkdirSync('dist',{recursive:true})\" && npm pack --pack-destination dist",
+    "pack:smoke": "node tools/pack-smoke.mjs",
+    "e2e:access": "node demo/e2e-access.cjs"
   },
   "devDependencies": {
     "playwright": "^1.65.0"
-  }
+  },
+  "main": "./sdk/office-viewer.mjs",
+  "exports": {
+    ".": "./sdk/office-viewer.mjs",
+    "./viewer": "./sdk/office-viewer.mjs",
+    "./extract": "./src/extract/index.mjs",
+    "./package.json": "./package.json",
+    "./server": "./sdk/sign.mjs"
+  },
+  "files": [
+    "sdk",
+    "src",
+    "LICENSE",
+    "NOTICE",
+    "README.md"
+  ],
+  "sideEffects": false
 }

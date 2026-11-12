@@ -37,3 +37,28 @@ Host to viewer: `{target: 'office-wasm-viewer', id, method, params}`; answers `{
 `{source, type: 'event', event, data}`. Methods: `open`, `exportPdf`, `save`, `convert`, `fontNames`, `close`, `getState`. The full table is in
 `office-wasm-viewer/README.md` (section Messages); the contract is the public interface between the two projects.
 
+
+## Packaging
+
+```
+npm run pack                                   # -> dist/office-wasm-sdk-<v>.tgz (12 files, 20 kB, Apache-2.0)
+npm run pack:smoke -- dist/office-wasm-sdk-<v>.tgz
+```
+
+Entry points: `office-wasm-sdk` / `office-wasm-sdk/viewer` (`OfficeViewer`, iframe + postMessage) and `office-wasm-sdk/extract` (text extraction). The demo, samples and tools stay out.
+`pack:smoke` unpacks the archive, imports both entry points, checks that no AGPL header is inside and extracts text from a sample.
+The viewer it talks to is packaged by `office-wasm-viewer` (`docs/packaging.md` there).
+
+### Only your applications may use the viewer
+
+The viewer site lists the pages allowed to embed it in a config file (`office-wasm-viewer/tools/serve.cjs --config`, `"frameAncestors": ["https://educora.vn", "https://*.educora.vn"]`;
+edit the file to change the domains, no restart). To also require a signed URL, give the site a `tokenScope` and the secret (`OFFICE_WASM_TOKEN_SECRET`), then sign its URL on your server
+(Node, never in the page) and hand the result to the page:
+
+```js
+import { signViewerUrl } from 'office-wasm-sdk/server';
+const url = signViewerUrl({ base: 'https://viewer.educora.vn', secret: process.env.OFFICE_WASM_TOKEN_SECRET, ttlSeconds: 3600 }); // scope defaults to "viewer"
+// in the page: OfficeViewer.create(box, { url })
+```
+
+Details: `office-wasm-viewer/docs/packaging.md`. Test: `npm run e2e:access` (`-- --site <packed site>` for a packed one).
